@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 app.use(express.json());
+const pino = require("pino");
+const logger = pino({ level: process.env.LOG_LEVEL || "info" }, { transport : { target: 'pino-pretty', options: { colorize: true } } });
 
 // our "database" data
 let users = [
@@ -48,7 +50,7 @@ app.get("/reviews/:id", (req, res) => {
   }
 });
 
-app.get("/users", (req, res) => res.json(users));
+app.get("/users", (req, res) => { res.json(users); logger.info("Fetched all users"); });
 
 app.get("/users/:id", (req, res) => {
   const user = users.find(u => u.id === parseInt(req.params.id));
@@ -57,14 +59,17 @@ app.get("/users/:id", (req, res) => {
   } else {
     res.status(404).json({ error: "User not found" });
   }
+  logger.info(`Fetched user with id: ${req.params.id}`);
 });
 
-app.get("/reviews", (req, res) => res.json(reviews));
+app.get("/reviews", (req, res) => { res.json(reviews); logger.info("Fetched all reviews"); });
 
 app.post("/reviews", (req, res) => {
   const newReview = { id: reviews.length + 1, ...req.body };
   reviews.push(newReview);
   res.status(201).json(newReview);
+  logger.info(`Created new review with id: ${newReview.id}`);
 });
+
 
 app.listen(3000, () => console.log("Movie App monolith running on port 3000"));
