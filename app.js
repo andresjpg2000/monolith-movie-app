@@ -26,6 +26,7 @@ app.get("/movies", (req, res) => res.json(movies));
 app.get("/movies/:id", (req, res) => {
   const movie = movies.find(m => m.id === parseInt(req.params.id));
   if (!movie) {
+    logger.error(`Movie not found with id: ${req.params.id}`);
     return res.status(404).json({ error: "Movie not found" });
   }
 
@@ -46,6 +47,7 @@ app.get("/reviews/:id", (req, res) => {
   if (review) {
     res.json(review);
   } else {
+    logger.error(`Review not found with id: ${req.params.id}`);
     res.status(404).json({ error: "Review not found" });
   }
 });
@@ -57,6 +59,7 @@ app.get("/users/:id", (req, res) => {
   if (user) {
     res.json(user);
   } else {
+    logger.error(`User not found with id: ${req.params.id}`);
     res.status(404).json({ error: "User not found" });
   }
   logger.info(`Fetched user with id: ${req.params.id}`);
